@@ -98,6 +98,11 @@ function getPackageName(manifestPath, buildGradlePath) {
     return packageName;
 }
 
+/**
+ * 从AndroidManifest.xml文件中解析包名，其实就是获取package属性的值
+ * @param androidManifest
+ * @returns {*|null}
+ */
 function parsePackageNameFromAndroidManifestFile(androidManifest) {
     const matchArray = androidManifest.match(/package="(.+?)"/);
     if (matchArray && matchArray.length > 0) {
@@ -123,6 +128,13 @@ function validatePackageName(packageName) {
 }
 
 // Search for applicationId at defaultConfig object
+
+/**
+ * 从build.gradle文件中解析应用程序ID
+ * 如果build.gradle中存在applicationId字段，则返回该字段的值，否则返回null
+ * @param buildGradlePath
+ * @returns {*|string|null}
+ */
 function parseApplicationIdFromBuildGradleFile(buildGradlePath) {
     if (!buildGradlePath) {
         return null;

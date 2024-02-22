@@ -82,22 +82,15 @@ function _interopRequireDefault(obj) {
 const searchPlaces = ['react-native.config.js'];
 
 /**
- * 获取用户自定义的配置信息，从react-native.config.js文件中读取
- * 如果不存在，返回默认值: {"dependencies":{},"project":{"ios":{},"android":{}},"assets":[],"commands":[],"platforms":{}}
- * @param rootFolder
- * @returns {*}
+ * Reads a project configuration as defined by the user in the current
+ * workspace.
  */
 function readConfigFromDisk(rootFolder) {
-    /**
-     * 从react-native目录中的react-native.config.js文件中读取配置信息
-     */
     const explorer = (0, _cosmiconfig().default)('react-native', {
         searchPlaces,
         stopDir: rootFolder
     });
-    console.log(`readConfigFromDisk.js readConfigFromDisk rootFolder: `, rootFolder);
     const searchResult = explorer.searchSync(rootFolder);
-    console.log(`readConfigFromDisk.js readConfigFromDisk searchResult: `, searchResult);
     const config = searchResult ? searchResult.config : undefined;
     const result = schema.projectConfig.validate(config);
     if (result.error) {
@@ -107,42 +100,18 @@ function readConfigFromDisk(rootFolder) {
 }
 
 /**
- * 读取开发人员在`node_modules`中定义的依赖项的配置。
- * 返回值格式：{"dependency":{"platforms":{}},"commands":[],"platforms":{},"healthChecks":[]}
- * @param rootFolder  依赖库的根目录
- * @param dependencyName 依赖库的名称
- * @returns {*}
+ * Reads a dependency configuration as defined by the developer
+ * inside `node_modules`.
  */
 function readDependencyConfigFromDisk(rootFolder, dependencyName) {
     const explorer = (0, _cosmiconfig().default)('react-native', {
-        stopDir: rootFolder,
-        searchPlaces
+        searchPlaces,
+        stopDir: rootFolder
     });
-
-    /*
-    * 以react-native为例，rootFolder的值为：
-    * /Users/yuzhiqiang/workspace/RN/personal/RNProjectAnalysis/node_modules/react-native
-    * */
-    console.log(`readDependencyConfigFromDisk.js readDependencyConfigFromDisk rootFolder: `, rootFolder);
+    console.log(`searchPlaces=${JSON.stringify(searchPlaces)}`)
+    console.log(`readDependencyConfigFromDisk: rootFolder=${rootFolder},dependencyName=${dependencyName}`)
     const searchResult = explorer.searchSync(rootFolder);
-    /**
-     * searchResult的值为：
-     *  {
-     *   config: {
-     *     commands: [
-     *       [Object], [Object],
-     *       [Object], [Object],
-     *       [Object], [Object],
-     *       [Object], [Object],
-     *       [Object]
-     *     ],
-     *     platforms: { ios: [Object], android: [Object] }
-     *   },
-     *   filepath: '/Users/yuzhiqiang/workspace/RN/personal/RNProjectAnalysis/node_modules/react-native/react-native.config.js'
-     * }
-     * 也就是说实际上最终获取的是react-native.config.js文件中的内容。
-     */
-    console.log(`readDependencyConfigFromDisk.js readDependencyConfigFromDisk searchResult: `, searchResult);
+    console.log(`readDependencyConfigFromDisk: searchResult=${JSON.stringify(searchResult)}`)
     const config = searchResult ? searchResult.config : emptyDependencyConfig;
     const result = schema.dependencyConfig.validate(config, {
         abortEarly: false

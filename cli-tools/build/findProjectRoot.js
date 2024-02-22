@@ -23,7 +23,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Finds project root by looking for a closest `package.json`.
  */
+
+/**
+ * 在当前目录下查找package.json文件，如果找到则返回package.json所在的目录
+ * @param cwd
+ * @returns {*}
+ */
 function findProjectRoot(cwd = process.cwd()) {
+  /**
+   * process.cwd() 是获取当前执行node命令时候的文件夹目录名
+   * @type {string}
+   */
   const packageLocation = _findUp().default.sync('package.json', {
     cwd
   });

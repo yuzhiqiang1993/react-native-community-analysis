@@ -57,23 +57,39 @@ function _interopRequireDefault(obj) {
  * defaults specified by user into consideration
  */
 function projectConfig(root, userConfig = {}) {
+    //_findAndroidDir:获取的是android目录
     const src = userConfig.sourceDir || (0, _findAndroidDir.default)(root);
+    console.log(`projectConfig 获取的android目录: ${src}`)
     if (!src) {
         return null;
     }
+    //获取android目录的绝对路径
     const sourceDir = _path().default.join(root, src);
+    console.log(`projectConfig 获取的android目录的绝对路径: ${sourceDir}`)
+    //获取app模块的目录名
     const appName = getAppName(sourceDir, userConfig.appName);
+    console.log(`projectConfig 获取的appName: ${appName}`)
+    //获取manifest文件的路径
     const manifestPath = userConfig.manifestPath ? _path().default.join(sourceDir, userConfig.manifestPath) : (0, _findManifest.default)(_path().default.join(sourceDir, appName));
+    console.log(`projectConfig 获取的manifestPath: ${manifestPath}`)
+    //获取build.gradle的路径
     const buildGradlePath = (0, _findBuildGradle.findBuildGradle)(sourceDir, false);
+    console.log(`projectConfig 获取的buildGradlePath: ${buildGradlePath}`)
     if (!manifestPath && !buildGradlePath) {
         return null;
     }
+    //获取包名
     const packageName = userConfig.packageName || (0, _getAndroidProject.getPackageName)(manifestPath, buildGradlePath);
     if (!packageName) {
         throw new (_cliTools().CLIError)(`Package name not found in neither ${manifestPath} nor ${buildGradlePath}`);
     }
+    console.log(`projectConfig 获取的packageName: ${packageName}`)
+    //获取应用程序ID
     const applicationId = buildGradlePath ? getApplicationId(buildGradlePath, packageName) : packageName;
+    console.log(`projectConfig 获取的applicationId: ${applicationId}`)
+    //获取主Activity
     const mainActivity = (0, _getMainActivity.default)(manifestPath || '') ?? '';
+    console.log(`projectConfig 获取的mainActivity: ${mainActivity}`)
     return {
         sourceDir,
         appName,
@@ -86,6 +102,12 @@ function projectConfig(root, userConfig = {}) {
     };
 }
 
+/**
+ * 获取应用程序ID
+ * @param buildGradlePath
+ * @param packageName
+ * @returns {*}
+ */
 function getApplicationId(buildGradlePath, packageName) {
     let appId = packageName;
     const applicationId = (0, _getAndroidProject.parseApplicationIdFromBuildGradleFile)(buildGradlePath);
@@ -95,11 +117,19 @@ function getApplicationId(buildGradlePath, packageName) {
     return appId;
 }
 
+/**
+ * 获取应用程序名称
+ * @param sourceDir
+ * @param userConfigAppName
+ * @returns {string}
+ */
 function getAppName(sourceDir, userConfigAppName) {
     let appName = '';
+    //如果用户配置了appName并且是字符串类型，并且在sourceDir目录下存在这个文件夹
     if (typeof userConfigAppName === 'string' && _fs().default.existsSync(_path().default.join(sourceDir, userConfigAppName))) {
         appName = userConfigAppName;
     } else if (_fs().default.existsSync(_path().default.join(sourceDir, 'app'))) {
+        //默认返回app
         appName = 'app';
     }
     return appName;

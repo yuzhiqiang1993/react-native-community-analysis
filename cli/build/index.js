@@ -130,6 +130,10 @@ function attachCommand(command, config) {
                 await command.func(argv, passedOptions, config);
             } else if (isAttachedCommand(command)) {
                 console.log(`await isAttachedCommand :${command.name} \n`)
+                /**
+                 * 说白了就是例如执行的是 node xxxx/bin.js config
+                 * 那么 config 命令就是 isAttachedCommand ，会得到执行
+                 */
                 await command.func(argv, config, passedOptions);
             } else {
                 throw new Error('A command must be either attached or detached');
@@ -167,8 +171,8 @@ async function setupAndRun(platformName) {
 
     console.log(`setupAndRun 入口开始执行----`)
     if (isCommandPassed('config')) {
-        // _cliTools().logger.disable();
-        _cliTools().logger.enable();
+        _cliTools().logger.disable();
+        // _cliTools().logger.enable();
     }
     _cliTools().logger.setVerbose(process.argv.includes('--verbose'));
 
@@ -189,12 +193,19 @@ async function setupAndRun(platformName) {
     try {
         console.log(`开始执行cli 的config 获取配置逻辑 \n`)
         config = (0, _cliConfig().default)();
+
         console.log(`获取配置完毕 \n`)
+        console.log(`config:${JSON.stringify(config)}`)
+        console.log(`\n`)
+
 
         _cliTools().logger.enable();
         const commands = {};
 
         // Reduce overridden commands before registering
+        /**
+         * 把项目命令和配置命令合并
+         */
         for (const command of [..._commands.projectCommands, ...config.commands]) {
             // console.log(`commandName:${command.name}`)
             commands[command.name] = command;
@@ -202,6 +213,7 @@ async function setupAndRun(platformName) {
         // console.log(`commands:${JSON.stringify(commands)}`)
 
         for (const command of Object.values(commands)) {
+            //注册命令
             attachCommand(command, config);
         }
     } catch (error) {
@@ -222,10 +234,14 @@ async function setupAndRun(platformName) {
     }
     const argv = [...process.argv];
 
+    console.log(`argv:${argv} \n`)
+
     // If out of tree platform specifices custom platform name, we need to pass it to argv array for the init command.
     if (isCommandPassed('init') && platformName) {
         argv.push('--platform-name', platformName);
     }
+    console.log(`argv:${argv} \n`)
+    //这里就是执行具体的命令，例如运行了：node xxxx/bin.js config，那么就会执行 config 命令
     program.parse(argv);
 }
 

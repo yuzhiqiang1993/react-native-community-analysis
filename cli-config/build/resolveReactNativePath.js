@@ -26,10 +26,8 @@ function _cliTools() {
  */
 function resolveReactNativePath(root) {
     try {
-
         console.log("解析ReactNative路径的路径，root： ", root);
         return (0, _cliTools().resolveNodeModuleDir)(root, 'react-native');
-
     } catch (_ignored) {
         throw new (_cliTools().CLIError)(`
       Unable to find React Native files looking up from ${root}. Make sure "react-native" module is installed

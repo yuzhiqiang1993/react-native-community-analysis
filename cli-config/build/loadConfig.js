@@ -130,14 +130,17 @@ function loadConfig(projectRoot = (0, _cliTools().findProjectRoot)()) {
 
     const initialConfig = {
         root: projectRoot,
-        //获取reactNativePath，实际上就是android项目的绝对路径。只有在后续在使用到该属性时才会被调用。调用的就是 resolveReactNativePath.js 中的 resolveReactNativePath 函数
+        /*
+        * 获取reactNativePath，实际上获取的就是node_module目录中的react-native目录的绝对路径。/Users/yuzhiqiang/workspace/RN/personal/RNProjectAnalysis/node_modules/react-native
+        * 只有在后续在使用到该属性时才会被调用。调用的就是 resolveReactNativePath.js 中的 resolveReactNativePath 函数
+        * */
         get reactNativePath() {
             console.log(`loadConfig: initialConfig 获取 reactNativePath `)
             const data = userConfig.reactNativePath ? _path().default.resolve(projectRoot, userConfig.reactNativePath) : (0, _resolveReactNativePath.default)(projectRoot);
             console.log(`loadConfig: initialConfig 获取 reactNativePath结束 \n`)
             return data
         },
-        //获取reactNativeVersion，调用的是index.js中的getReactNativeVersion函数
+        //获取reactNativeVersion，调用的是index.js中的getReactNativeVersion函数,最终获取的是react-native的版本号
         get reactNativeVersion() {
             console.log(`loadConfig: initialConfig 获取 reactNativeVersion`)
             const verison = getReactNativeVersion(initialConfig.reactNativePath);
@@ -160,6 +163,7 @@ function loadConfig(projectRoot = (0, _cliTools().findProjectRoot)()) {
             console.log(`loadConfig: initialConfig 获取项目信息`)
             for (const platform in finalConfig.platforms) {
                 const platformConfig = finalConfig.platforms[platform];
+                console.log(`loadConfig: initialConfig 获取项目信息 platform=${JSON.stringify(platform)}`)
                 if (platformConfig) {
                     lazyProject[platform] = platformConfig.projectConfig(projectRoot, userConfig.project[platform] || {});
                 }
@@ -172,8 +176,8 @@ function loadConfig(projectRoot = (0, _cliTools().findProjectRoot)()) {
     console.log(`开始处理依赖项------------ ，先查找依赖，获取各个依赖项的配置信息，然后跟initialConfig 中的数据进行合并，最后返回数据 \n`)
 
     /**
-     * 1.先获取用户自定义的依赖项以及通过findDependencies.js中的findDependencies函数获取项目的依赖项
-     * 2.通过reduce方法迭代数据时，对acc的值进行累加，初始值是initialConfig，是一个配置对象，dependencyName是当前正在处理的数组元素，即依赖项的名称。
+     * 1.先获取用户自定义的依赖项以及通过 findDependencies.js中的findDependencies函数获取项目的依赖项
+     * 2.通过reduce方法迭代数据时，对acc的值进行累加，初始值是 initialConfig，是一个配置对象，dependencyName是当前正在处理的数组元素，即依赖项的名称。
      */
     const finalConfig = Array.from(new Set([...Object.keys(userConfig.dependencies), ...(0, _findDependencies.default)(projectRoot)]))
         .reduce((acc, dependencyName) => {
@@ -185,7 +189,7 @@ function loadConfig(projectRoot = (0, _cliTools().findProjectRoot)()) {
             console.log(`\n`)
             console.log(`依赖名=${dependencyName}`)
             const localDependencyRoot = userConfig.dependencies[dependencyName] && userConfig.dependencies[dependencyName].root;
-            // console.log(`loadConfig: finalConfig localDependencyRoot=${localDependencyRoot}\n`)
+            // console.log(`loadConfig: finalConfig localDependencyRoot=${localDependencyRoot}`)
             try {
                 console.log(`开始获取 ${dependencyName} 的根路径`)
                 let root = localDependencyRoot || (0, _cliTools().resolveNodeModuleDir)(projectRoot, dependencyName);

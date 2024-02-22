@@ -132,7 +132,7 @@ function pickValues(obj, keys, names) {
  */
 function findPackageDependencyDir(ref, options) {
 
-    // console.log(`获取包依赖的目录 ref: `, ref, ` options: `, options);
+    console.log(`获取包依赖的目录 ref: `, ref, ` options: `, options);
 
     const pkgName = typeof ref === 'string' ? ref : path().join(ref.scope ?? '', ref.name);
     console.log(`findPackageDependencyDir pkgName: `, pkgName)
